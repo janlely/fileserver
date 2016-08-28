@@ -5,7 +5,7 @@
 #include <event2/buffer.h>
 #include <event2/http.h>
 
-const char * serve_common_upload(const struct evhttp_request *request);
+const char * serve_common_upload(struct evhttp_request *request);
 
 
 #endif

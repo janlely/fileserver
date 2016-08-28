@@ -33,7 +33,7 @@ void generic_handler(struct evhttp_request *req, void *arg)
     /* } */
     /* printf("content:\n %s\n", content); */
 
-     
+
     /* evbuffer_add_printf(buf, "Server Responsed. Requested: %s\n", evhttp_request_get_uri(req)); */
     evhttp_send_reply(req, HTTP_OK, "OK", buf);
     evbuffer_free(buf);

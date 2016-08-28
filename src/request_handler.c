@@ -2,7 +2,7 @@
 #include <string.h>
 
 
-void handler_request(const struct evhttp_request *request, struct evbuffer *response_buf)
+void handler_request(struct evhttp_request *request, struct evbuffer *response_buf)
 {
 
     const char *response_body;
@@ -13,7 +13,7 @@ void handler_request(const struct evhttp_request *request, struct evbuffer *resp
     {
         response_body = serve_common_upload(request);
     }
-    
+
     evbuffer_add_printf(response_buf, "%s\n", response_body);
 
 }

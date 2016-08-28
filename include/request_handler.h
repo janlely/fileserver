@@ -3,5 +3,5 @@
 
 #include "common_upload_service.h"
 
-void handler_request(const struct  evhttp_request *request, struct evbuffer *response_buf);
+void handler_request(struct  evhttp_request *request, struct evbuffer *response_buf);
 #endif
