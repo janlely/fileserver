@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 2.8.9)
-project (fileserver)
+PROJECT(fileserver)
+
 AUX_SOURCE_DIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/src SRC_LIST)
 add_executable(fileserver ${SRC_LIST})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include /usr/local/include/json-c)
 find_library(LIBEVENT event PATHS /usr/local/lib)
 target_link_libraries(fileserver ${LIBEVENT})
-set(CMAKE_C_FLAGS "-v")
+set(CMAKE_C_FLAGS "-v -g -O0")

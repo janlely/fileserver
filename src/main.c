@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
 {
 
     short          http_port = 8081;
-    char          *http_addr = "127.0.0.1";
+    char          *http_addr = "0.0.0.0";
 
     struct event_base * base = event_base_new();
 

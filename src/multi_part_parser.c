@@ -5,7 +5,7 @@
 multi_part_info parse_multi_part_content(const void *content, size_t size,  const char *boundry)
 {
 
-    multi_part_info result;
+    multi_part_info result = {0,0,0,0};
 
     const void *p = content;
     part_info part = get_fisrt_part(p, size, boundry);
@@ -20,6 +20,7 @@ multi_part_info parse_multi_part_content(const void *content, size_t size,  cons
             result.file_part_length = part.content_length;
         }
         p = part.content + part.content_length;
+        p += 4; /*skip \r\n--*/
         part = get_fisrt_part(p, size - (p - content) - 1, boundry);
     }
     return result;
@@ -29,6 +30,7 @@ part_info get_fisrt_part(const void *content, size_t size,  const char *boundry)
 {
 
     int boundry_len = strlen(boundry);
+
     if (strncmp((char *)content, boundry, boundry_len) != 0)
     {
         return (part_info){0,0,0,0,0,0};
@@ -43,10 +45,11 @@ part_info get_fisrt_part(const void *content, size_t size,  const char *boundry)
     /* check first part Content-Type*/
     const void *content_type = memmem(content, size,  "Content-Type:", 13);
     const void *content_name = memmem(content, size, "Content-Disposition:", 20);
-    const void *content_body = memmem(content, size,  "\n\n", 2);
+    const void *content_body = memmem(content, size,  "\r\n\r\n", 4);
+    content_body += 4;
     const void *next_part = memmem(content, size, boundry, boundry_len);
-    result.content = content_body + 2;
-    result.content_length = next_part - content_body;
+    result.content = content_body;
+    result.content_length = next_part - content_body - 4; /*-4 to skip \r\n--*/
 
     if (content_type == NULL || content_name == NULL)
         return (part_info){0,0,0,0,0,0};
@@ -69,6 +72,7 @@ part_info get_fisrt_part(const void *content, size_t size,  const char *boundry)
     content_name = strstr((char *)content_name, "name=");
     if (content_name == NULL)
         return (part_info){0,0,0,0,0,0};
+    content_name += 5;
     /* strip space */
     while(((char *)content_name)[0] == ' ')
         content_name++;
