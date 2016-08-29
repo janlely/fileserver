@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "multi_part_parser.h"
+#include "common_utils.h"
+#include "image_file_handler.h"
 #include <regex.h>
 #include <json.h>
 
@@ -15,7 +17,8 @@ void serve_common_upload(struct evhttp_request *request, char * response)
     int cl = 0;
     if(content_length == NULL || strlen(content_length) <= 0)
     {
-        return "Bad request";
+        strcpy(response, "Bad request");
+        return;
     }
 
     regex_t reg;
@@ -24,12 +27,16 @@ void serve_common_upload(struct evhttp_request *request, char * response)
     regcomp(&reg, pattern, REG_EXTENDED);
     int status = regexec(&reg, content_type, 3, pmatch, 0);
 
-    if(status == REG_NOMATCH)
-        return "Bad request";
+    if(status == REG_NOMATCH){
+        strcpy(response, "Bad request");
+        return;
+    }
+
 
     int bs = pmatch[2].rm_so; /*boundry start index*/
     int be = pmatch[2].rm_eo; /*boundry end index*/
     char *boundry = (char *)malloc(be - bs + 2);
+    memset(boundry, 0, be - bs + 2);
     strncpy(boundry, content_type + bs, be - bs + 1);
 
 
@@ -51,16 +58,22 @@ void serve_common_upload(struct evhttp_request *request, char * response)
 
    /* parse multipart request body  */
     multi_part_info info = parse_multi_part_content(content+2, cl, boundry);/* content+2 to skip the first -- */
-    if(info.string_part_length == 0 || info.file_part_length == 0)
-        return "Bad request";
+    if(info.string_part_length == 0 || info.file_part_length == 0){
+        strcpy(response, "Bad request");
+        return;
+    }
 
     char *string_part = (char *)malloc(info.string_part_length + 1);/*+1 for \0*/
+    memset(string_part, 0, info.string_part_length + 1);
     strncpy(string_part, info.string_part, info.string_part_length);
     json_object *jobj = json_tokener_parse(string_part);
-    if(json_object_get_type(jobj) != json_type_object)
-        return "Bad request";
+    if(json_object_get_type(jobj) != json_type_object){
+        strcpy(response, "Bad request");
+        return;
+    }
 
-    const char *file_type = get_string_from_jsonobject(jobj, "type");
+    char file_type[10];
+    get_string_from_jsonobject(jobj, file_type, "type");
     if(strcmp("image", file_type) == 0){
         handler_image_file(string_part, info.file_part, info.file_part_length, response);
     }

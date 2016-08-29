@@ -1,6 +1,7 @@
 #include "multi_part_parser.h"
 #include <string.h>
 #include <stdlib.h>
+#include <common_define.h>
 
 multi_part_info parse_multi_part_content(const void *content, size_t size,  const char *boundry)
 {
@@ -11,7 +12,7 @@ multi_part_info parse_multi_part_content(const void *content, size_t size,  cons
     part_info part = get_fisrt_part(p, size, boundry);
     while(part.content_length != 0){
         if(strncmp(part.content_type, "text/plain", 10) == 0
-                && strncmp(part.name, "fileName", part.name_length) == 0){
+                && strncmp(part.name, TEXT_PART_NAME, part.name_length) == 0){
             result.string_part = part.content;
             result.string_part_length = part.content_length;
         }else if(strncmp(part.content_type, "application/octet-stream", 24) == 0

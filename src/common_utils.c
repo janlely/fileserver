@@ -1,13 +1,18 @@
 #include "common_utils.h"
+/* #include <io.h> */
 #include "json.h"
 #include "common_define.h"
+#include <stdio.h>
+#include <time.h>
+#include <sys/stat.h>
+#include <ossp/uuid.h>
 
-const char *get_string_from_jsonobject(const json_object *src, const char *key)
+void get_string_from_jsonobject(const json_object *src, char *dest, const char *key)
 {
     json_object *jobj = json_object_object_get(src, key);
     if(json_object_get_type(jobj) != json_type_string)
-        return NULL;
-    return json_object_get_string(jobj);
+        strcpy(dest, "");
+    strcpy(dest, json_object_get_string(jobj));
 }
 
 void put_int_value_to_jsonstring(char *dest, const char *key, int value)
@@ -27,13 +32,11 @@ void put_int_value_to_jsonstring(char *dest, const char *key, int value)
             json_object_object_del(jobj, key);
             json_object_object_add(jobj, key, json_object_new_int(value));
         }
-        const char *jstr = json_object_to_json_string(jobj);
+        const char *jstr = json_object_to_json_string_ext(jobj, JSON_C_TO_STRING_NOSLASHESCAPE);
         strcpy(dest, jstr);
     }
 
     json_object_put(jobj);
-    if(new_jobj != NULL)
-        json_object_put(new_jobj);
 }
 
 void put_string_value_to_jsonstring(char *dest, const char *key, const char *value)
@@ -53,11 +56,90 @@ void put_string_value_to_jsonstring(char *dest, const char *key, const char *val
             json_object_object_del(jobj, key);
             json_object_object_add(jobj, key, json_object_new_string(value));
         }
-        const char *jstr = json_object_to_json_string(jobj);
+        const char *jstr = json_object_to_json_string_ext(jobj, JSON_C_TO_STRING_NOSLASHESCAPE);
         strcpy(dest, jstr);
     }
 
     json_object_put(jobj);
-    if(new_jobj != NULL)
-        json_object_put(new_jobj);
+}
+
+void get_uuid(char *dest)
+{
+    char *str = NULL;
+    uuid_t *uuid;
+    uuid_create(&uuid);
+    uuid_make(uuid, UUID_MAKE_V1);
+    uuid_export(uuid, UUID_FMT_STR, &str, NULL);
+    uuid_destroy(uuid);
+
+    strncpy(dest, str, 8);/*strncpy won't append \0 to the end*/
+    dest[8] = 0; /*append \0 manually*/
+    strncat(dest, str+9, 4);
+    strncat(dest, str+14, 4);
+    strncat(dest, str+19, 4);
+    strncat(dest, str+24, 12);
+
+    free(str);
+}
+
+
+
+void get_base_path(char *str, size_t len, const char *type)
+{
+    sprintf(str, "/upload/%s", type);
+    time_t now = time(NULL);
+    struct tm *t_info;
+    t_info = localtime(&now);
+    char tmp[20];
+    strftime (tmp, sizeof(tmp), "/%Y-%m/%d", t_info);
+    if(strlen(tmp) > len)
+    {
+        printf("error: base_path array not enougth space!\n");
+        return;
+    }
+    strcat(str, tmp);
+}
+
+int mkdirs(const char *dir)
+{
+    char tmp[256];
+    char *p = NULL;
+    size_t len;
+
+    snprintf(tmp, sizeof(tmp),"%s",dir);
+    len = strlen(tmp);
+    if(tmp[len - 1] == '/')
+        tmp[len - 1] = 0;
+    for(p = tmp + 1; *p; p++)
+        if(*p == '/') {
+            *p = 0;
+            if(!dir_exist(tmp) && mkdir(tmp, S_IRWXU) != 0){
+                printf("error: can't create dir: %s!\n", tmp);
+                return 0;
+            }
+            *p = '/';
+        }
+    if(!dir_exist(tmp) && mkdir(tmp, S_IRWXU) != 0){
+        printf("error: can't create dir: %s!\n", tmp);
+        return 0;
+    }
+    return 1;
+}
+
+
+
+int dir_exist(const char *dir)
+{
+    if(access(dir, F_OK) == 0)
+        return 1;/*exist*/
+    else
+        return 0;/*not exist*/
+}
+
+int dir_writeable(const char *dir)
+{
+    if(access(dir, W_OK) == 0)
+        return 1;/*readable*/
+    else
+        return 0;/*un readable*/
 }

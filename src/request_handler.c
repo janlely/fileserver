@@ -1,5 +1,6 @@
 #include "request_handler.h"
 #include <string.h>
+#include <stdlib.h>
 
 
 void handler_request(struct evhttp_request *request, struct evbuffer *response_buf)
@@ -15,7 +16,7 @@ void handler_request(struct evhttp_request *request, struct evbuffer *response_b
         serve_common_upload(request, response);
     }
 
-    evbuffer_add_printf(response_buf, "%s\n", response_body);
+    evbuffer_add_printf(response_buf, "%s\n", response);
     free(response);
 
 }
