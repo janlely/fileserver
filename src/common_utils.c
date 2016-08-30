@@ -6,6 +6,7 @@
 #include <time.h>
 #include <sys/stat.h>
 #include <ossp/uuid.h>
+#include <sys/timeb.h>
 
 void get_string_from_jsonobject(const json_object *src, char *dest, const char *key)
 {
@@ -142,4 +143,11 @@ int dir_writeable(const char *dir)
         return 1;/*readable*/
     else
         return 0;/*un readable*/
+}
+
+long long get_current_time_mil()
+{
+    struct timeb t;
+    ftime(&t);
+    return 1000 * t.time + t.millitm;
 }

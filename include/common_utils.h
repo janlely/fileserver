@@ -17,5 +17,7 @@ int mkdirs(const char *dir);
 int dir_exist(const char *dir);
 
 int dir_writeable(const char *dir);
+
+long long get_current_time_mil();
 #endif
 

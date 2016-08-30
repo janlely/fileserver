@@ -14,5 +14,14 @@ find_library(LIBUUID uuid PATHS /usr/local/Cellar/ossp-uuid/1.6.2_2/lib)
 message("libuuid libs: ${LIBUUID}")
 find_library(LIBJSON json-c PATHS /usr/local/lib)
 message("libjson-c libs: ${LIBJSON}")
-target_link_libraries(fileserver ${LIBEVENT} ${LIBUUID} ${LIBJSON} ${ImageMagick_LIBRARIES})
-set(CMAKE_C_FLAGS "-v -g -O0")
+target_link_libraries(fileserver ${LIBEVENT} ${LIBUUID} ${LIBJSON} ${ImageMagick_LIBRARIES} pthread)
+
+IF(CMAKE_BUILD_TYPE MATCHES Debug)
+    message("Debug build")
+    set(CMAKE_C_FLAGS "-v -g -O0")
+ELSE()
+    message("Release build")
+    set(CMAKE_C_FLAGS "-v -O2")
+ENDIF()
+
+
