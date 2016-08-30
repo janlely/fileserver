@@ -1,3 +1,4 @@
+#define _GUN_SOURCE 1
 #include "multi_part_parser.h"
 #include <string.h>
 #include <stdlib.h>
