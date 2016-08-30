@@ -1,4 +1,5 @@
 #include "common_utils.h"
+#include <string.h>
 #include "json-c/json.h"
 #include "common_define.h"
 #include <stdio.h>
@@ -150,3 +151,29 @@ long long get_current_time_mil()
     ftime(&t);
     return 1000 * t.time + t.millitm;
 }
+
+void *memstr(const void *l, size_t l_len, const void *s, size_t s_len)
+{
+    char *cur, *last;
+	const char *cl = (const char *)l;
+	const char *cs = (const char *)s;
+
+	if (l_len == 0 || s_len == 0)
+		return NULL;
+
+	if (l_len < s_len)
+		return NULL;
+
+	if (s_len == 1)
+		return memchr(l, (int)*cs, l_len);
+
+	last = (char *)cl + l_len - s_len;
+
+	for (cur = (char *)cl; cur <= last; cur++)
+		if (cur[0] == cs[0] && memcmp(cur, cs, s_len) == 0)
+			return cur;
+
+	return NULL;
+}
+
+

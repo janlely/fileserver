@@ -1,5 +1,5 @@
-#define _GUN_SOURCE 1
 #include "multi_part_parser.h"
+#include "common_utils.h"
 #include <string.h>
 #include <stdlib.h>
 #include <common_define.h>
@@ -10,6 +10,7 @@ multi_part_info parse_multi_part_content(const void *content, size_t size,  cons
     multi_part_info result = {0,0,0,0};
 
     const void *p = content;
+    printf("hello hello\n");
     part_info part = get_fisrt_part(p, size, boundry);
     while(part.content_length != 0){
         if(strncmp(part.content_type, "text/plain", 10) == 0
@@ -45,16 +46,20 @@ part_info get_fisrt_part(const void *content, size_t size,  const char *boundry)
     content = content + boundry_len + 1;
     size = size - boundry_len - 1; /*1 stand for the \n*/
     /* check first part Content-Type*/
-    const void *content_type = memmem(content, size,  "Content-Type:", 13);
-    const void *content_name = memmem(content, size, "Content-Disposition:", 20);
-    const void *content_body = memmem(content, size,  "\r\n\r\n", 4);
-    content_body += 4;
-    const void *next_part = memmem(content, size, boundry, boundry_len);
+    /* const void *content_type = memmem(content, size,  "Content-Type:", 13); */
+    const void *content_type = strstr(content,"Content-Type:");
+    /* const void *content_name = memmem(content, size, "Content-Disposition:", 20); */
+    const void *content_name = strstr(content, "Content-Disposition:");
+    /* const void *content_body = memmem(content, size,  "\r\n\r\n", 4); */
+    const void *content_body = strstr(content, "\r\n\r\n");
+    const void *next_part = memstr((const char *)content, size, boundry, boundry_len);
+    if(content_body == NULL || content_name == NULL
+            || content_body == NULL){
+        return (part_info){0,0,0,0,0,0};
+    }
+    content_body += 4; /*skip \r\n\r\n*/
     result.content = content_body;
     result.content_length = next_part - content_body - 4; /*-4 to skip \r\n--*/
-
-    if (content_type == NULL || content_name == NULL)
-        return (part_info){0,0,0,0,0,0};
 
     content_type += strlen("Content-Type:");
     /* strip space */
