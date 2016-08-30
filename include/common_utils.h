@@ -1,6 +1,6 @@
 #ifndef _COMMON_UTILS_H
 #define _COMMON_UTILS_H
-#include <json.h>
+#include <json-c/json.h>
 
 void get_string_from_jsonobject(const json_object *src, char *dest, const char *key);
 

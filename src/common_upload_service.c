@@ -5,7 +5,7 @@
 #include "common_utils.h"
 #include "image_file_handler.h"
 #include <regex.h>
-#include <json.h>
+#include <json-c/json.h>
 
 void serve_common_upload(struct evhttp_request *request, char * response)
 {
