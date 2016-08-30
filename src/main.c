@@ -145,6 +145,9 @@ int main(int argc, char *argv[]) {
         printf("Usage: ./fileserver <port> <thread number> <backlog> \n");
         return 0;
     }
-    httpserver_start(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]));
+    int port = atoi(argv[1]);
+    int threads = atoi(argv[2]);
+    int backlog = atoi(argv[3]);
+    httpserver_start(port, threads, backlog);
     return 0;
 }
