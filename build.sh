@@ -54,12 +54,14 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 if [ $? -ne 0 ];then
     echo "error: cmake failed"
+    cd ../deps && rm -rf ossp json-c
     exit 0;
 fi
 make
 
 if [ $? -ne 0 ];then
     echo "error: make failed"
+    cd ../deps && rm -rf ossp json-c
     exit 0;
 fi
 cp fileserver ../
