@@ -16,7 +16,7 @@ void serve_common_upload(struct evhttp_request *request, char * response)
     int cl = 0;
     if(content_length == NULL || strlen(content_length) <= 0)
     {
-        strcpy(response, "Bad request");
+        strcpy(response, "BAD_REQUEST");
         return;
     }
 
@@ -27,7 +27,7 @@ void serve_common_upload(struct evhttp_request *request, char * response)
     int status = regexec(&reg, content_type, 3, pmatch, 0);
 
     if(status == REG_NOMATCH){
-        strcpy(response, "Bad request");
+        strcpy(response, "BAD_REQUEST");
         return;
     }
 
@@ -57,7 +57,7 @@ void serve_common_upload(struct evhttp_request *request, char * response)
    /* parse multipart request body  */
     multi_part_info info = parse_multi_part_content(content+2, cl, boundry);/* content+2 to skip the first -- */
     if(info.string_part_length == 0 || info.file_part_length == 0){
-        strcpy(response, "Bad request");
+        strcpy(response, "BAD_REQUEST");
         return;
     }
 
@@ -66,7 +66,7 @@ void serve_common_upload(struct evhttp_request *request, char * response)
     strncpy(string_part, info.string_part, info.string_part_length);
     json_object *jobj = json_tokener_parse(string_part);
     if(json_object_get_type(jobj) != json_type_object){
-        strcpy(response, "Bad request");
+        strcpy(response, "BAD_REQUEST");
         return;
     }
 

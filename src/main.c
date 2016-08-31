@@ -55,8 +55,7 @@ int httpserver_start(int port, int nthreads, int backlog) {
         if (base == NULL) return -1;
         struct evhttp *httpd = evhttp_new(base);
         if (httpd == NULL) return -1;
-        r = evhttp_accept_socket(httpd, nfd);
-        if (r != 0) return -1;
+        r = evhttp_accept_socket(httpd, nfd); if (r != 0) return -1;
         evhttp_set_gencb(httpd, httpserver_GenericHandler, NULL);
         r = pthread_create(&ths[i], NULL, httpserver_Dispatch, base);
         if (r != 0) return -1;
@@ -86,10 +85,21 @@ void httpserver_ProcessRequest(struct evhttp_request *req) {
         return;
     }
 
-    handler_request(req, buf);
+    char *response = (char *)malloc(1000);
+    memset(response, 0, 1000);
 
-    /* evbuffer_add_printf(buf, "Server Responsed. Requested: %s\n", evhttp_request_get_uri(req)); */
-    evhttp_send_reply(req, HTTP_OK, "OK", buf);
+    handler_request(req, response);
+
+    if(strcmp(response, "NOT_FOUND") == 0){
+        evhttp_send_reply(req, HTTP_NOTFOUND, "NOT_FOUND", buf);
+    }else if(strcpy(response, "BAD_REQUEST") == 0){
+        evhttp_send_reply(req, TTP_BADREQUEST, "BAD_REQUEST", buf);
+    }else{
+        evhttp_send_reply(req, TTP_OK, "OK", buf);
+        evbuffer_add_printf(response_buf, "%s\n", response);
+    }
+
+    free(response);
     evbuffer_free(buf);
 }
 
