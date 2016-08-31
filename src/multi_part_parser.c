@@ -10,7 +10,6 @@ multi_part_info parse_multi_part_content(const void *content, size_t size,  cons
     multi_part_info result = {0,0,0,0};
 
     const void *p = content;
-    printf("hello hello\n");
     part_info part = get_fisrt_part(p, size, boundry);
     while(part.content_length != 0){
         if(strncmp(part.content_type, "text/plain", 10) == 0

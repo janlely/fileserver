@@ -13,7 +13,6 @@ void serve_common_upload(struct evhttp_request *request, char * response)
     const struct evkeyvalq *headers = evhttp_request_get_input_headers(request);
     const char *content_length = evhttp_find_header(headers, "Content-Length");
     const char *content_type = evhttp_find_header(headers, "Content-Type");
-    printf("Content-Type: %s\n", content_type);
     int cl = 0;
     if(content_length == NULL || strlen(content_length) <= 0)
     {
@@ -43,7 +42,6 @@ void serve_common_upload(struct evhttp_request *request, char * response)
 
     //read raw data
     cl = atoi(content_length);
-    printf("content length: %d\n", cl);
     void *content = malloc (cl); /*malloc*/
     struct evbuffer *input_buf = evhttp_request_get_input_buffer(request);
 

@@ -183,7 +183,7 @@ void scale_image_four(const void *file, size_t file_length, image_blobs *blobs)
     }
 
     wand=DestroyMagickWand(wand);
-    MagickWandTerminus();
+    /* MagickWandTerminus(); */
 
 }
 
