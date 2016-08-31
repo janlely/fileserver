@@ -1,6 +1,14 @@
 #!/bin/bash
 
 BASEDIR=`pwd`
+
+# check libevent version
+ldconfig -p|grep libevent-2*.so
+if [ $? -ne 0];then
+    echo "please install libevent2 first!"
+    exit 0;
+fi 
+
 echo "building dependencies......"
 
 echo "building libjson-c"
