@@ -92,11 +92,11 @@ void httpserver_ProcessRequest(struct evhttp_request *req) {
 
     if(strcmp(response, "NOT_FOUND") == 0){
         evhttp_send_reply(req, HTTP_NOTFOUND, "NOT_FOUND", buf);
-    }else if(strcpy(response, "BAD_REQUEST") == 0){
+    }else if(strcmp(response, "BAD_REQUEST") == 0){
         evhttp_send_reply(req, HTTP_BADREQUEST, "BAD_REQUEST", buf);
     }else{
-        evhttp_send_reply(req, HTTP_OK, "OK", buf);
         evbuffer_add_printf(buf, "%s\n", response);
+        evhttp_send_reply(req, HTTP_OK, "OK", buf);
     }
 
     free(response);

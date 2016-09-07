@@ -30,10 +30,10 @@ void handler_image_file(const char *param, const void *file, size_t file_length,
     printf("info: image scale total time: %lld\n", get_current_time_mil() - start);
 
     image_links links;
-    links.original_link = (char *)malloc(100);
-    links.large_link = (char *)malloc(100);
-    links.middle_link = (char *)malloc(100);
-    links.small_link = (char *)malloc(100);
+    links.original_link = (char *)malloc(200);
+    links.large_link = (char *)malloc(200);
+    links.middle_link = (char *)malloc(200);
+    links.small_link = (char *)malloc(200);
 
     start = get_current_time_mil();
     if(write_image_four(&blobs, &links, suffix)){

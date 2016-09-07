@@ -8,6 +8,16 @@
 #include <ossp/uuid.h>
 #include <sys/timeb.h>
 
+int is_json_string(const char *dest)
+{
+    if(dest == NULL || strlen(dest) == 0)
+        return 0;
+    json_object *jobj = json_tokener_parse(dest);
+    if(json_object_get_type(jobj) != json_type_object)
+        return 0;
+    return 1;
+}
+
 void get_string_from_jsonobject(const json_object *src, char *dest, const char *key)
 {
     json_object *jobj = json_object_object_get(src, key);
@@ -18,14 +28,18 @@ void get_string_from_jsonobject(const json_object *src, char *dest, const char *
 
 void put_int_value_to_jsonstring(char *dest, const char *key, int value)
 {
-    json_object *jobj = json_tokener_parse(dest);
-    if(json_object_get_type(jobj) != json_type_object){
+    if(dest == NULL){
+        return;
+    }
+    json_object *jobj = NULL;
+    if(strlen(dest) == 0 || !is_json_string(dest)){
         json_object *new_jobj = json_object_new_object();
         json_object_object_add(new_jobj, key, json_object_new_int(value));
         const char *jstr = json_object_to_json_string(new_jobj);
         strcpy(dest, jstr);
         json_object_put(new_jobj);
     }else{
+        jobj = json_tokener_parse(dest);
         json_object *exist_value = json_object_object_get(jobj, key);
         if(exist_value == NULL){
             json_object_object_add(jobj, key, json_object_new_int(value));
@@ -35,9 +49,8 @@ void put_int_value_to_jsonstring(char *dest, const char *key, int value)
         }
         const char *jstr = json_object_to_json_string_ext(jobj, JSON_C_TO_STRING_NOSLASHESCAPE);
         strcpy(dest, jstr);
+        json_object_put(jobj);
     }
-
-    json_object_put(jobj);
 }
 
 void put_string_value_to_jsonstring(char *dest, const char *key, const char *value)

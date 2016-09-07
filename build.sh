@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ $# -lt 1 ];then
+    echo "Usage: ./build.sh <Debug|Release>"
+    exit
+fi
+
 BASEDIR=`pwd`
 UNAME=`uname -s`
 # check libevent version
@@ -10,7 +15,7 @@ if [ $UNAME == "Darwin" ];then
         exit 0;
     fi
 elif [ $UNAME == "Linux" ];then
-    ldconfig -p|grep libevent-2*.so
+    ldconfig -p|grep libevent-2*
     if [ $? -ne 0 ];then
         echo "please install libevent2 first!"
         exit 0;
@@ -51,7 +56,7 @@ fi
 cd $BASEDIR
 mkdir build
 cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake -DCMAKE_BUILD_TYPE=$1 ..
 if [ $? -ne 0 ];then
     echo "error: cmake failed"
     cd ../deps && rm -rf ossp json-c
